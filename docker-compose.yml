@@ -1,0 +1,41 @@
+version: '3'
+services:
+  db:
+    image: postgres:11-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - db:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    networks:
+      - backend
+  web: &web
+    build:
+      context: .
+      args:
+        INSTALL_DEPENDENCIES: vim curl htop
+        BUNDLE_INSTALL_ARGS: --jobs 10 --retry=3
+    depends_on:
+      - db 
+    volumes:
+      - .:/app
+    ports:
+      - 3000:3000
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432
+    networks:
+      - backend
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    links:
+      - db
+    stdin_open: true
+    tty: true
+volumes:
+  db:
+networks:
+  backend:
+    driver: 'bridge'
