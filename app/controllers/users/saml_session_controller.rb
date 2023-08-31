@@ -5,7 +5,6 @@ class Users::SamlSessionController < Devise::SamlSessionsController
   end
 
   def create
-    byebug
     super do |resource|
     end
   end
